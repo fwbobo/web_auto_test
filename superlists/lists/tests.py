@@ -15,5 +15,17 @@ class HomePageTest(TestCase):
     def  test_home_page_returns_correct_html(self):
         request = HttpRequest()
         reponse = home_page(request)
-        expected_html = render_to_string('home_page')
-        self.assertEqual(reponse.content.decode(), expected_html)
+        expected_html = render_to_string('home.html')
+        print('********************************************')
+        print(expected_html)
+        print('********************************************')
+        print(reponse.content.decode())
+        #self.assertEqual(expected_html, reponse.content.decode())
+
+    def test_home_page_can_save_a_POST_request(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = 'A new list item'
+
+        response = home_page(request)
+        self.assertIn('A new list item', response.content.decode())
