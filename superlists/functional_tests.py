@@ -40,8 +40,7 @@ class NewVisitorTest(unittest.TestCase):
         table = self.wb.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertTrue(
-            any(row.text == '1：buy peacock feathers' for row in rows),
-            "new to-do list did not appear in table"
+            any(row.text == '1：buy peacock feathers' for row in rows)
         )
 
         #页面上有显示了一个文本框，可以输入其他待办事项
