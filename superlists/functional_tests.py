@@ -46,10 +46,10 @@ class NewVisitorTest(unittest.TestCase):
         #她输入了use peacock to make a fly（使用孔雀羽毛做假的苍蝇）
         #伊丽丝做事很有条例
         inputbox = self.wb.find_element_by_id('id_new_item')
-        inputbox.send_keys('Use peacock to make a fly')
+        inputbox.send_keys('Use peacock feathers to make a fly')
         inputbox.send_keys(Keys.ENTER)
         self.check_for_row_in_list_table('1:Buy peacock feathers')
-        self.check_for_row_in_list_table('2:Use peacock to make a fly')
+        self.check_for_row_in_list_table('2:Use peacock feathers to make a fly')
 
         #页面再次更新时，她的清单中显示了这两个待办事项
         table = self.wb.find_element_by_id('id_list_table')
