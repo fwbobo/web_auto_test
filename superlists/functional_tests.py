@@ -30,7 +30,7 @@ class NewVisitorTest(unittest.TestCase):
 
         #她在一个文本框输入了buy peacock feathers
         #伊丽丝的爱好是用假的苍蝇做鱼儿钓鱼
-        inputbox.send_keys('buy peacock feathers')
+        inputbox.send_keys('Buy peacock feathers')
 
         #她按了回车之后，页面更新了
         #代办事项表格中显示了1：buy peacock feathers
@@ -39,18 +39,30 @@ class NewVisitorTest(unittest.TestCase):
         #time.sleep(10)#在这个代码的位置停止10 s
         table = self.wb.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == '1：buy peacock feathers' for row in rows),
-            "New to-do item did not appear in table"
-        )
+        self.assertIn('1:Buy peacock feathers', [row.text for row in rows])
+
 
         #页面上有显示了一个文本框，可以输入其他待办事项
         #她输入了use peacock to make a fly（使用孔雀羽毛做假的苍蝇）
         #伊丽丝做事很有条例
-        self.fail('Finish the test')#提醒测试结束
+        inputbox = self.wb.find_element_by_id('id_new_item')
+        inputbox.send_keys('Use peacock to make a fly')
+        inputbox.send_keys(Keys.ENTER)
 
         #页面再次更新时，她的清单中显示了这两个待办事项
+        table = self.wb.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1:Buy peacock feathers', [row.text for row in rows])
+        self.assertIn(
+            '2:Use peacock feathers to make a fly',
+            [row.text for row in rows]
+        )
 
+        #伊丽丝想知道这个网站是否会记住她的清单
+        #她看到网站为她生成了唯一的URL
+        #页面有一些文字解说这个功能
+
+        self.fail('Finish the test')  # 提醒测试结束
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
