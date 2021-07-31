@@ -1,9 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
+from django.test import LiveServerTestCase
 import time
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
         self.wb = webdriver.Chrome(r'E:\chromedriver.exe')
         self.wb.implicitly_wait(5)
@@ -19,7 +20,7 @@ class NewVisitorTest(unittest.TestCase):
     def test_can_start_a_list_and_retrive_it_later(self):
         #伊丽丝听说有一个很酷的在线代办事项应用
         #她去看了这个应用的首页
-        self.wb.get(' http://127.0.0.1:8000/')
+        self.wb.get(self.live_server_url)
 
         #她注意到网页的标题和首部都包含To-Do这个词
         self.assertIn('To-Do', self.wb.title)
@@ -65,6 +66,3 @@ class NewVisitorTest(unittest.TestCase):
         #页面有一些文字解说这个功能
 
         self.fail('Finish the test')  # 提醒测试结束
-
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')

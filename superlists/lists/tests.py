@@ -68,10 +68,8 @@ class HomePageTest(TestCase):
     def test_home_page_displays_all_list_items(self):
         Item.objects.create(text = 'itemey_1')
         Item.objects.create(text = 'itemey_2')
-
         request = HttpRequest()
         response = home_page(request)
-
         self.assertIn('itemey_1', response.content.decode())
         self.assertIn('itemey_2', response.content.decode())
 
