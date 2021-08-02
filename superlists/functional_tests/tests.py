@@ -41,6 +41,10 @@ class NewVisitorTest(LiveServerTestCase):
         #她按了回车之后，页面更新了
         #代办事项表格中显示了1：buy peacock feathers
         inputbox.send_keys(Keys.ENTER)
+        edit_list_url = self.wb.current_url
+        print('******************')
+        print(edit_list_url)
+        self.assertRegex(edit_list_url, 'lists/.+')#检查字符串和正则表达式是否一样
         self.check_for_row_in_list_table('1:Buy peacock feathers')
 
         #页面上又显示了一个文本框，可以输入其他待办事项
@@ -55,14 +59,61 @@ class NewVisitorTest(LiveServerTestCase):
         #页面再次更新时，她的清单中显示了这两个待办事项
         table = self.wb.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1:Buy peacock feathers', [row.text for row in rows])
-        self.assertIn(
-            '2:Use peacock feathers to make a fly',
-            [row.text for row in rows]
-        )
+        self.check_for_row_in_list_table('1:Buy peacock feathers')
+        self.check_for_row_in_list_table('2:Use peacock feathers to make a fly')
 
-        #伊丽丝想知道这个网站是否会记住她的清单
-        #她看到网站为她生成了唯一的URL
-        #页面有一些文字解说这个功能
+        #现在一个叫弗朗西斯的新用户访问了网站
 
-        self.fail('Finish the test')  # 提醒测试结束
+        ##我们使用一个新的浏览器会话
+        ##确保伊丽丝的信息不会从cookie中泄露出来
+        self.wb.quit()
+        self.wb = webdriver.Chrome(r'E:\chromedriver.exe')
+
+        #弗朗西斯访问主页
+        #页面中看不见伊丽丝的清单
+        self.wb.get(self.live_server_url)
+        page_text = self.wb.find_element_by_tag_name('body').text
+        self.assertNotIn('1:Buy peacock feathers', page_text)
+        self.assertNotIn('2:Use peacock feathers to make a fly', page_text)
+
+        #弗朗西斯输入一个新待办事项，新建一个清单
+        #他不像伊丽丝那么兴趣使然
+        inputbox = self.wb.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
+
+        #弗兰西斯获得了他的唯一URL
+        francis_list_url = self.wb.current_url
+        self.assertRegex(francis_list_url, '/list/.+')
+        self.assertNotEqual(francis_list_url, edit_list_url)
+
+        #这个页面还是没有伊丽丝的清单
+        page_text = self.wb.find_element_by_id('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertIn('Buy milk', page_text)
+
+        #两人都很满意，去睡觉了
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
