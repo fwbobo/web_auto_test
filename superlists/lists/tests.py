@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import resolve
 from lists.views import home_page
 from django.template.loader import render_to_string
-from lists.models import Item
+from lists.models import Item, List
 # Create your tests here.
 
 
@@ -13,30 +13,30 @@ class HomePageTest(TestCase):
         found = resolve('/')#resolve 反向解析根路径 “/”看是否能找到home_page函数
         self .assertEqual(found.func, home_page)
 
-    def  test_home_page_returns_correct_html(self):
+    def test_home_page_returns_correct_html(self):
         request = HttpRequest()
         response = home_page(request)
         expected_html = render_to_string('home.html')
         self.assertEqual(expected_html, response.content.decode())
 
-
-
-    def test_home_page_only_saves_items_when_necessary(self):
-        request = HttpRequest()
-        home_page(request)
-        self.assertEqual(Item.objects.count(), 0)
-
-
-class ItemModelTest(TestCase):
+class ListAndItemModelTest(TestCase):
 
     def test_saving_and_retrieving_items(self):
+        list_ = List()
+        list_.save()
+
         first_item = Item()
         first_item.text = 'The first (ever) list item'
+        first_item.list = list_
         first_item.save()
 
         second_item = Item()
         second_item.text = 'Item the second'
+        second_item.list = list_
         second_item.save()
+
+        saved_list = List.objects.first()
+        self.assertEqual(saved_list, list_)
 
         saved_items = Item.objects.all()
         self.assertEqual(saved_items.count(), 2)
@@ -44,20 +44,30 @@ class ItemModelTest(TestCase):
         first_saved_item = saved_items[0]
         second_saved_item = saved_items[1]
         self.assertEqual(first_saved_item.text, 'The first (ever) list item')
+        self.assertEqual(first_saved_item.list, list_)
         self.assertEqual(second_saved_item.text, 'Item the second')
+        self.assertEqual(second_saved_item.list, list_)
 
 class ListViewTest(TestCase):
 
     def test_uses_list_templates(self):
-        response = self.client.get('/lists/the-only-list-in-the-world/')#很像selenium的get
+        list_ = List.objects.create()
+        response = self.client.get('/lists/%d/'%(list_.id,))#很像selenium的get
         self.assertTemplateUsed(response, 'list.html')
-    def test_home_page_displays_all_list_items(self):
-        Item.objects.create(text='itemey_1')
-        Item.objects.create(text='itemey_2')
 
-        response = self.client.get('/lists/the-only-list-in-the-world/')#很像selenium的get
+    def test_displays_only_items_for_that_list(self):
+        correct_list = List.objects.create()
+        Item.objects.create(text='itemey_1', list=correct_list)
+        Item.objects.create(text='itemey_2', list=correct_list)
+        other_list = List.objects.create()
+        Item.objects.create(text='other list item_1', list=other_list)
+        Item.objects.create(text='other list item_2', list=other_list)
+
+        response = self.client.get('/lists/%d/'%(correct_list.id,))#很像selenium的get
         self.assertContains(response, 'itemey_1')
         self.assertContains(response, 'itemey_2')
+        self.assertNotContains(response, 'other list item_1')
+        self.assertNotContains(response, 'other list item_2')
 
 
 class NewListTest(TestCase):
@@ -76,8 +86,9 @@ class NewListTest(TestCase):
             '/lists/new',
             data={'item_text': 'A new list item'}
         )
-        self.assertRedirects(response, '/lists/the-only-list-in-the-world/')
-       
+        new_list = List.objects.first()
+        self.assertRedirects(response, '/lists/%d/'%(new_list.id,))
+
 
 
 
