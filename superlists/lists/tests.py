@@ -64,8 +64,6 @@ class ListViewTest(TestCase):
         Item.objects.create(text='other list item_2', list=other_list)
 
         response = self.client.get('/lists/%d/'%(correct_list.id,))#很像selenium的get  通过url访问view再到html
-        print("******************************")
-        print(response, type(response))
         self.assertContains(response, 'itemey_1')
         self.assertContains(response, 'itemey_2')
         self.assertNotContains(response, 'other list item_1')
