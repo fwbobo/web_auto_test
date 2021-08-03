@@ -84,17 +84,36 @@ class NewVisitorTest(LiveServerTestCase):
 
         #弗兰西斯获得了他的唯一URL
         francis_list_url = self.wb.current_url
-        self.assertRegex(francis_list_url, '/list/.+')
+        self.assertRegex(francis_list_url, '/lists/.+')
         self.assertNotEqual(francis_list_url, edit_list_url)
 
         #这个页面还是没有伊丽丝的清单
-        page_text = self.wb.find_element_by_id('body').text
+        page_text = self.wb.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
 
         #两人都很满意，去睡觉了
 
+    def test_layout_and_styling(self):
+        self.wb.get(self.live_server_url)
+        self.wb.set_window_size(1024, 768)
 
+
+        inputbox = self.wb.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width']/2,  #取得X坐标的位置，然后加上size
+            512,
+            delta=10#表示误差为正负5像素
+        )
+
+        # 她新建了一个清单，看见输入框仍完美居中显示
+        inputbox.send_keys('testing\n')
+        inputbox = self.wb.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,  # 取得X坐标的位置，然后加上size
+            512,
+            delta=10  # 表示误差为正负5像素
+        )
 
 
 

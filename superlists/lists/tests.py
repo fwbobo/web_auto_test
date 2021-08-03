@@ -132,5 +132,3 @@ class NewItemTest(TestCase):
 
 
 
-
-

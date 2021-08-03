@@ -1,18 +1,13 @@
-<html>
-    <head>
-        <title>To-Do lists</title>
-    </head>
-    <body>
-        <h1>Start a new To-Do list</h1>
-        <form method="POST" action="/lists/{{ list.id }}/add_item">
+{% extends 'base.html' %}
 
-            <input name="item_text" id="id_new_item" placeholder="Enter a to-do item"/>
-        </form>
-        <table id="id_list_table">
-            {% for item in list.item_set.all %}
-<!--            list是item的外键，这是通过外键反向检测主键   外键.主键_set.all-->
-                <tr><td>{{ forloop.counter }}:{{ item.text }}</td></tr>
-            {% endfor %}
-        </table>
-    </body>
-</html>
+{% block header_text %}Your To-Do list{% endblock %}
+
+{% block from_action %}/lists/{{ list.id }}/add_item{% endblock %}
+
+{% block table %}
+    <table id="id_list_table">
+        {% for item in list.item_set.all %}
+            <tr><td>{{ forloop.counter }}:{{ item.text }}</td></tr>
+        {% endfor %}
+    </table>
+{% endblock %}
